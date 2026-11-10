@@ -8,3 +8,8 @@ createRoot(document.getElementById('root')!).render(
     <App />
   </StrictMode>
 );
+
+if (import.meta.env.PROD && 'serviceWorker' in navigator) {
+  // best-effort: the game works fine without it (non-HTTPS, private mode, ...)
+  navigator.serviceWorker.register('./sw.js').catch(() => {});
+}
