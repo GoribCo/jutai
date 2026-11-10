@@ -78,7 +78,6 @@ export function Scene({ spitter, event, onSpitterTap }: SceneProps) {
           </g>
         )}
         <Head dir={p.dir} state={state} cap={k === 'driver' ? '#1e3a8a' : undefined} tuft={k === 'passenger'} />
-        {state === 'spit' && <rect x="-44" y="-44" width="88" height="88" fill="transparent" style={{ cursor: 'pointer' }} onPointerDown={onSpitterTap} />}
       </g>
     );
   });
@@ -223,10 +222,15 @@ export function Scene({ spitter, event, onSpitterTap }: SceneProps) {
           {swing}
 
           {/* translucent roof so the passengers stay visible from above */}
-          <path d="M76 150 Q76 130 110 116 L250 116 Q284 130 284 150 L284 430 Q284 440 270 440 L90 440 Q76 440 76 430Z" fill="#14532d" opacity=".16" stroke="#14532d" strokeOpacity=".5" strokeWidth="3" />
+          <path d="M76 150 Q76 130 110 116 L250 116 Q284 130 284 150 L284 430 Q284 440 270 440 L90 440 Q76 440 76 430Z" fill="#14532d" opacity=".16" stroke="#14532d" strokeOpacity=".5" strokeWidth="3" pointerEvents="none" />
           {[[86, 126], [274, 126], [86, 432], [274, 432]].map(([x, y]) => (
-            <circle key={x + '-' + y} cx={x} cy={y} r="5" fill="#365314" />
+            <circle key={x + '-' + y} cx={x} cy={y} r="5" fill="#365314" pointerEvents="none" />
           ))}
+
+          {/* tap the spitting head (drawn last so nothing sits on top of it) */}
+          {spitter && (
+            <rect x={FRONT[spitter].x - 46} y={FRONT[spitter].y - 46} width="92" height="92" fill="transparent" style={{ cursor: 'pointer' }} onPointerDown={onSpitterTap} aria-label="Jutai!" />
+          )}
         </g>
       </svg>
     </div>
