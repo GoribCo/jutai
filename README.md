@@ -1,4 +1,4 @@
-# lucky-ludu
+# jutai
 
 A browser-based Ludu game built with React, TypeScript, and Vite.
 
@@ -17,7 +17,7 @@ npm run dev
 2. Commit and push the workflow and accompanying changes to `main`.
 3. Open **Actions → Deploy to GitHub Pages** to monitor deployment. You can also run it manually using **Run workflow** on `main`.
 
-The expected site URL is https://goribco.github.io/lucky-ludu/.
+The expected site URL is https://goribco.github.io/jutai/.
 
 The workflow installs locked dependencies with `npm ci`, builds the app into `dist`, and deploys that artifact using the built-in `GITHUB_TOKEN`. No personal access token or repository secrets are required. Each push to `main` redeploys the site.
 
@@ -26,8 +26,8 @@ The build reads the base path from GitHub Pages configuration, so asset URLs wor
 To preview a production build under the current repository path:
 
 ```sh
-npm run build -- --base /lucky-ludu/
-npm run preview -- --base /lucky-ludu/
+npm run build -- --base /jutai/
+npm run preview -- --base /jutai/
 ```
 
-Open http://localhost:4173/lucky-ludu/.
+Open http://localhost:4173/jutai/.
