@@ -1,32 +1,37 @@
 import { useEffect, useState } from 'react';
 import type { GameEvent, Spitter } from '../game/engine';
-import { Character, Hand, PlayerBack, Sandal, type CharState } from './Character';
+import { Head, Sandal, type CharState } from './Character';
 
-// The view is 360x500 and drawn with `meet`, so all of it is always visible. Backgrounds and the auto's
-// body extend EX units past the edges to fill taller/wider screens.
+// Top-down view of an auto-rickshaw driving up the screen. 360x500 view, drawn with `meet`; the road,
+// pavements and anything else at the edges extend EX units so tall or wide screens are filled.
 const EX = 700;
 const W = 360;
 const VH = 500;
-const HORIZON = 190;
+const SKIN = '#e0a878';
 
-// Head centres. Driver sits centre-right, front passenger on the left.
-const S = 0.8; // people are drawn at 80% size
-const POS: Record<Spitter, { x: number; y: number; r: number; shirt: string }> = {
-  driver: { x: 236, y: 284, r: 34, shirt: '#60a5fa' },
-  passenger: { x: 112, y: 298, r: 28, shirt: '#fb923c' },
+// Front row: front passenger (left) and driver. Back row: three people side by side.
+const FRONT: Record<Spitter, { x: number; y: number; shirt: string; dir: 1 | -1 }> = {
+  passenger: { x: 125, y: 232, shirt: '#fb923c', dir: -1 },
+  driver: { x: 218, y: 232, shirt: '#60a5fa', dir: 1 },
 };
-// The player sits behind: hands rest beside the shoulders, sandals are on the feet. On a spit the hand on the
-// spitter's side grabs the sandal off the foot and slaps.
-const HS = 1.4; // hands and sandals are drawn large: they are right in front of the player
-const HAND: Record<Spitter, { side: 'left' | 'right'; x: number; y: number; fx: number; fy: number }> = {
-  driver: { side: 'right', x: 268, y: 452, fx: 314, fy: 472 },
-  passenger: { side: 'left', x: 92, y: 452, fx: 46, fy: 472 },
+const REAR = [
+  { id: 'L', x: 112, y: 350, shirt: '#7c3aed' },
+  { id: 'M', x: 180, y: 350, shirt: '#f472b6' },
+  { id: 'R', x: 248, y: 350, shirt: '#10b981' },
+] as const;
+// Who slaps whom: the rear person behind the spitter swings the arm on the side nearest the target.
+const SLAPPER: Record<Spitter, { rear: 'L' | 'R'; side: 1 | -1 }> = {
+  passenger: { rear: 'L', side: 1 },
+  driver: { rear: 'R', side: -1 },
 };
-// Where the sandal lands: the head, turned outward (see Character).
-const impact = (k: Spitter) => {
-  const dir = k === 'driver' ? 1 : -1;
-  return { x: POS[k].x + dir * 22 * S, y: POS[k].y + 4 * S + 54 * HS }; // +54: sandal centre sits above the fist
-};
+const SANDAL_IN_HAND = 0.3; // kept small on purpose
+
+const PAVE = [
+  { x: -60, y: 10, w: 44, h: 80, c: '#b45309' },
+  { x: -150, y: 120, w: 70, h: 90, c: '#be123c' },
+  { x: 356, y: 40, w: 60, h: 70, c: '#0f766e' },
+  { x: 440, y: 150, w: 70, h: 60, c: '#a16207' },
+];
 
 interface SceneProps {
   spitter: Spitter | null;
@@ -35,13 +40,13 @@ interface SceneProps {
 }
 
 export function Scene({ spitter, event, onSpitterTap }: SceneProps) {
-  // On a hit the hand swings at once; the face reacts when the sandal lands.
+  // On a hit the arm swings at once; the face reacts when the sandal lands.
   const [slap, setSlap] = useState<{ id: number; spitter: Spitter } | null>(null);
   const [face, setFace] = useState<Spitter | null>(null);
   useEffect(() => {
     if (event?.type !== 'hit') return;
     setSlap({ id: event.id, spitter: event.spitter });
-    const t1 = setTimeout(() => setFace(event.spitter), 120);
+    const t1 = setTimeout(() => setFace(event.spitter), 150);
     const t2 = setTimeout(() => {
       setSlap(null);
       setFace(null);
@@ -52,159 +57,177 @@ export function Scene({ spitter, event, onSpitterTap }: SceneProps) {
     };
   }, [event]);
 
-  const people = (Object.keys(POS) as Spitter[]).map((kind) => {
-    const { x, y, r, shirt } = POS[kind];
-    const state: CharState = face === kind ? 'slapped' : spitter === kind ? 'spit' : 'idle';
+  const front = (Object.keys(FRONT) as Spitter[]).map((k) => {
+    const p = FRONT[k];
+    const state: CharState = face === k ? 'slapped' : spitter === k ? 'spit' : 'idle';
     return (
-      <g key={kind} transform={`translate(${x} ${y}) scale(${S})`}>
-        {/* torso (seen from behind) */}
-        <path d={`M${-r - 22} 300 Q${-r - 22} ${r - 2} ${-12} ${r - 2} L12 ${r - 2} Q${r + 22} ${r - 2} ${r + 22} 300Z`} fill={shirt} />
-        <rect x="-10" y={r - 12} width="20" height="16" fill="#c98d5c" />
-        {kind === 'driver' && (
+      <g key={k} transform={`translate(${p.x} ${p.y})`}>
+        <ellipse cy="14" rx="28" ry="13" fill={p.shirt} />
+        {k === 'driver' ? (
           <g>
-            {/* checked gamcha over the shoulder */}
-            <path d="M-58 90 L-14 40 L2 54 L-42 108Z" fill="#dc2626" />
-            <path d="M-50 82 L-8 46 M-44 96 L-2 60 M-56 92 L-30 62 M-38 100 L-12 70" stroke="#fff" strokeWidth="2" opacity=".7" />
+            {/* arms out to the handlebar */}
+            <path d="M-20 12 L-24 -26 M20 12 L24 -26" stroke={p.shirt} strokeWidth="9" strokeLinecap="round" />
+            <circle cx="-24" cy="-28" r="5" fill={SKIN} />
+            <circle cx="24" cy="-28" r="5" fill={SKIN} />
+          </g>
+        ) : (
+          <g>
+            <path d="M-22 12 L-14 -14 M22 12 L14 -14" stroke={p.shirt} strokeWidth="9" strokeLinecap="round" />
+            <circle cx="-13" cy="-16" r="5" fill={SKIN} />
+            <circle cx="13" cy="-16" r="5" fill={SKIN} />
           </g>
         )}
-        <Character kind={kind} state={state} />
-        {spitter === kind && state === 'spit' && (
-          // generous tap target over the spitter
-          <rect x={-r - 30} y={-r - 40} width={2 * r + 60} height="200" fill="transparent" style={{ cursor: 'pointer' }} onPointerDown={onSpitterTap} />
-        )}
+        <Head dir={p.dir} state={state} cap={k === 'driver' ? '#1e3a8a' : undefined} tuft={k === 'passenger'} />
+        {state === 'spit' && <rect x="-44" y="-44" width="88" height="88" fill="transparent" style={{ cursor: 'pointer' }} onPointerDown={onSpitterTap} />}
       </g>
     );
   });
 
+  const slapper = slap ? SLAPPER[slap.spitter] : null;
+
+  const rear = REAR.map((p) => {
+    const swinging = slapper?.rear === p.id;
+    const footGone = swinging ? slapper.side : 0; // the foot on the swinging arm's side loses its sandal
+    return (
+      <g key={p.id} transform={`translate(${p.x} ${p.y})`}>
+        {/* legs forward to the floor, bare feet in sandals */}
+        {([-1, 1] as const).map((s) => (
+          <g key={s}>
+            <path d={`M${s * 9} 18 L${s * 9} -34`} stroke="#334155" strokeWidth="13" strokeLinecap="round" />
+            <g transform={`translate(${s * 9} -60) scale(.26)`}>
+              <Sandal foot sole={footGone !== s} />
+            </g>
+          </g>
+        ))}
+        <ellipse cy="14" rx="28" ry="13" fill={p.shirt} />
+        {/* resting arms, hands on the thighs */}
+        {([-1, 1] as const).map((s) =>
+          swinging && slapper.side === s ? null : (
+            <g key={s}>
+              <path d={`M${s * 24} 12 L${s * 13} -20`} stroke={p.shirt} strokeWidth="9" strokeLinecap="round" />
+              <circle cx={s * 13} cy="-22" r="5" fill={SKIN} />
+            </g>
+          ),
+        )}
+        <Head dir={1} state="idle" hair={p.id === 'M' ? '#44403c' : '#1c1917'} />
+      </g>
+    );
+  });
+
+  // The swinging arm: shoulder → just behind the spitter's head. Drawn as a stretching sleeve plus a fist holding a small sandal.
+  let swing = null;
+  if (slap && slapper) {
+    const from = REAR.find((r) => r.id === slapper.rear)!;
+    const to = FRONT[slap.spitter];
+    const sx = from.x + slapper.side * 24;
+    const sy = from.y + 12;
+    const fx = to.x;
+    const fy = to.y + 30;
+    const d = Math.hypot(fx - sx, fy - sy);
+    const angle = (Math.atan2(fx - sx, -(fy - sy)) * 180) / Math.PI;
+    swing = (
+      <g key={slap.id} transform={`translate(${sx} ${sy}) rotate(${angle})`}>
+        <g className="arm-ext">
+          <rect x="-4.5" y={-d} width="9" height={d} rx="4" fill={from.shirt} />
+        </g>
+        <g className="fist-ext" style={{ '--d': `${d}px` } as React.CSSProperties}>
+          <g transform={`translate(0 ${-50 * SANDAL_IN_HAND - 2}) scale(${SANDAL_IN_HAND})`}>
+            <Sandal />
+          </g>
+          <circle r="5.5" fill={SKIN} stroke="#a16207" strokeWidth="1" />
+        </g>
+      </g>
+    );
+  }
+
+  const treads = (w: number, y0: number) =>
+    Array.from({ length: 8 }, (_, i) => <rect key={i} x={-w / 2} y={y0 + 12 * i} width={w} height="5" fill="#52525b" />);
+
   return (
-    <div className="relative h-full w-full overflow-hidden bg-sky-300">
+    <div className="relative h-full w-full overflow-hidden bg-stone-400">
       <svg
         viewBox={`0 0 ${W} ${VH}`}
         preserveAspectRatio="xMidYMid meet"
         className="absolute inset-0 h-full w-full overflow-visible"
         role="img"
-        aria-label="View from the back seat of an auto-rickshaw"
+        aria-label="Top view of an auto-rickshaw: a driver and a passenger in front, three passengers behind"
       >
         <defs>
-          <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0" stopColor="#7dd3fc" />
-            <stop offset="1" stopColor="#fef3c7" />
-          </linearGradient>
-          <clipPath id="tire">
-            <rect x="-18" y="-36" width="36" height="72" rx="7" />
+          <clipPath id="tire-r">
+            <rect x="-13" y="-32" width="26" height="64" rx="7" />
+          </clipPath>
+          <clipPath id="tire-f">
+            <rect x="-9" y="-26" width="18" height="52" rx="5" />
           </clipPath>
         </defs>
-        {/* outside world */}
-        <rect x={-EX} y={-EX} width={W + 2 * EX} height={HORIZON + EX} fill="url(#sky)" />
-        <g className="skyline-drift" fill="#b08968" opacity=".7">
-          {[-360, 0, 360, 720].map((o) => (
-            <g key={o} transform={`translate(${o} 0)`}>
-              <rect x="0" y="140" width="50" height="50" />
-              <rect x="58" y="115" width="38" height="75" />
-              <rect x="104" y="150" width="60" height="40" />
-              <rect x="172" y="105" width="44" height="85" />
-              <rect x="224" y="135" width="34" height="55" />
-              <rect x="266" y="152" width="40" height="38" />
-              <rect x="314" y="125" width="40" height="65" />
+
+        {/* pavements, roofs and road, all scrolling down (the auto drives up) */}
+        <rect x={-EX} y={-EX} width={W + 2 * EX} height={VH + 2 * EX} fill="#a8a29e" />
+        <g className="scroll-side">
+          {Array.from({ length: 10 }, (_, i) => (
+            <g key={i} transform={`translate(0 ${-480 + i * 240})`}>
+              {PAVE.map((b, j) => (
+                <rect key={j} x={b.x} y={b.y} width={b.w} height={b.h} rx="4" fill={b.c} opacity=".85" />
+              ))}
             </g>
           ))}
         </g>
-        <rect x={-EX} y={HORIZON} width={W + 2 * EX} height={VH - HORIZON + EX} fill="#a8a29e" />
-        <polygon points="165,190 195,190 1200,1200 -840,1200" fill="#44444c" />
-        {[0, 1, 2, 3].map((i) => (
-          <rect key={i} className="road-dash" style={{ animationDelay: `${-i * 0.3}s` }} x="177" y="400" width="6" height="80" fill="#fde68a" />
-        ))}
+        <rect x="14" y={-EX} width="332" height={VH + 2 * EX} fill="#3f3f46" />
+        <rect x="14" y={-EX} width="4" height={VH + 2 * EX} fill="#f4f4f5" />
+        <rect x="342" y={-EX} width="4" height={VH + 2 * EX} fill="#f4f4f5" />
+        <g className="scroll-road" fill="#fde68a">
+          {Array.from({ length: 22 }, (_, i) => (
+            <rect key={i} x="177" y={-400 + i * 80} width="6" height="40" />
+          ))}
+        </g>
 
-        {/* auto-rickshaw: windshield post, dash panel, front wheel seen from behind */}
         <g className="rattle">
-          <rect x="168" y="30" width="6" height="320" fill="#365314" />
-          <rect x={-EX} y="340" width={W + 2 * EX} height={VH - 340 + EX} fill="#15803d" />
-          <rect x={-EX} y="340" width={W + 2 * EX} height="10" fill="#fde047" />
-          {/* From behind a wheel shows only its tread, scrolling upward: that reads as "moving forward". */}
-          <g transform="translate(171 372)">
-            <rect x="-18" y="-36" width="36" height="72" rx="7" fill="#18181b" />
-            <g clipPath="url(#tire)">
-              <g className="tread">
-                {Array.from({ length: 11 }, (_, i) => (
-                  <rect key={i} x="-18" y={-48 + 12 * i} width="36" height="5" fill="#52525b" />
-                ))}
+          {/* rear wheels, half under the body: tread scrolls forward (up) */}
+          {[64, 296].map((x) => (
+            <g key={x} transform={`translate(${x} 398)`}>
+              <rect x="-13" y="-32" width="26" height="64" rx="7" fill="#18181b" />
+              <g clipPath="url(#tire-r)">
+                <g className="tread">{treads(26, -44)}</g>
               </g>
-            </g>
-            <path d="M-34 -26 Q0 -56 34 -26 L34 -20 L-34 -20Z" fill="#166534" stroke="#fde047" strokeWidth="3" />
-          </g>
-        </g>
-
-        <g className="rattle">{people}</g>
-
-        {/* canopy and pillars in front of the people */}
-        <rect x={-EX} y={-EX} width={W + 2 * EX} height={EX + 30} fill="#14532d" />
-        <path d="M0 0 H360 V34 Q180 52 0 34Z" fill="#14532d" />
-        <rect x={-EX} y="30" width={W + 2 * EX} height="5" fill="#fde047" opacity=".85" />
-        <rect x={-EX} y="30" width={EX + 14} height={VH + EX} fill="#166534" />
-        <rect x="346" y="30" width={EX + 14} height={VH + EX} fill="#166534" />
-        <g stroke="#facc15" strokeWidth="2" fill="#ef4444">
-          {[60, 120, 180, 240, 300].map((x) => (
-            <g key={x}>
-              <line x1={x} y1="44" x2={x} y2="56" />
-              <circle cx={x} cy="60" r="4" />
             </g>
           ))}
-        </g>
 
-        {/* rear-view mirror */}
-        <g transform="translate(262 66)">
-          <line x1="0" y1="-14" x2="0" y2="0" stroke="#27272a" strokeWidth="4" />
-          <rect x="-34" y="0" width="68" height="40" rx="10" fill="#27272a" />
-          <rect x="-30" y="4" width="60" height="32" rx="7" fill="#dbeafe" />
-          <path d="M-30 36 Q0 20 30 36Z" fill="#7c3aed" />
-          <circle cy="18" r="11" fill="#e0a878" />
-          <path d="M-11 15 A11 11 0 0 1 11 15 Q0 10 -11 15Z" fill="#292524" />
-          <path d="M-8 12 L-3 14 M8 12 L3 14" stroke="#292524" strokeWidth="1.6" strokeLinecap="round" />
-          <circle cx="-4.5" cy="17.5" r="2.2" fill="#fff" />
-          <circle cx="4.5" cy="17.5" r="2.2" fill="#fff" />
-          <circle cx="-4.5" cy="18" r="1.1" fill="#111827" />
-          <circle cx="4.5" cy="18" r="1.1" fill="#111827" />
-          <path d="M-3.5 24 H3.5" stroke="#7f1d1d" strokeWidth="1.6" strokeLinecap="round" />
-        </g>
+          {/* body: nose, green shell, interior floor, seats */}
+          <path
+            d="M70 160 Q70 124 108 108 L136 80 Q180 50 224 80 L252 108 Q290 124 290 160 L290 424 Q290 446 268 446 L92 446 Q70 446 70 424Z"
+            fill="#15803d"
+            stroke="#14532d"
+            strokeWidth="4"
+          />
+          <rect x="70" y="140" width="220" height="6" fill="#fde047" opacity=".8" />
+          <rect x="84" y="166" width="192" height="266" rx="16" fill="#e7d5a8" />
+          <rect x="96" y="200" width="168" height="66" rx="12" fill="#7f1d1d" />
+          <rect x="90" y="312" width="180" height="82" rx="12" fill="#7f1d1d" />
+          <rect x="90" y="394" width="180" height="22" rx="8" fill="#5f1414" />
 
-        {/* the player, from behind: back of the head and shoulders at the bottom, empty hands, sandals on the feet */}
-        <rect x="-250" y="470" width="860" height={EX} fill="#7c3aed" />
-        <g transform="translate(180 448)">
-          <PlayerBack />
-        </g>
-        {(Object.keys(HAND) as Spitter[]).map((k) => {
-          const h = HAND[k];
-          const t = impact(k);
-          const slapping = slap?.spitter === k;
-          return (
-            <g key={k}>
-              {!slapping && (
-                <g transform={`translate(${h.fx} ${h.fy}) rotate(${h.side === 'left' ? -12 : 12}) scale(.8)`}>
-                  <Sandal foot />
-                </g>
-              )}
-              <g transform={`translate(${h.x} ${h.y})`}>
-                <g
-                  key={slapping ? slap.id : 'rest'}
-                  className={slapping ? 'hand-slap' : undefined}
-                  style={
-                    {
-                      '--fx': `${h.fx - h.x}px`,
-                      '--fy': `${h.fy - h.y - 20}px`,
-                      '--dx': `${t.x - h.x}px`,
-                      '--dy': `${t.y - h.y}px`,
-                      '--rot': `${h.side === 'right' ? -22 : 22}deg`,
-                    } as React.CSSProperties
-                  }
-                >
-                  <g transform={`scale(${HS})`}>
-                    <Hand side={h.side} holding={slapping} />
-                  </g>
-                </g>
-              </g>
+          {/* front wheel pokes out ahead of the nose, with a mudguard over its rear half */}
+          <g transform="translate(180 56)">
+            <rect x="-9" y="-26" width="18" height="52" rx="5" fill="#18181b" />
+            <g clipPath="url(#tire-f)">
+              <g className="tread">{treads(18, -34)}</g>
             </g>
-          );
-        })}
+          </g>
+          <path d="M163 62 Q180 40 197 62 L197 70 L163 70Z" fill="#166534" stroke="#14532d" strokeWidth="2" />
+          <circle cx="180" cy="94" r="6" fill="#fef9c3" stroke="#a16207" strokeWidth="2" />
+          {/* handlebar */}
+          <path d="M180 100 V170" stroke="#52525b" strokeWidth="5" />
+          <path d="M150 176 Q180 166 250 176" stroke="#27272a" strokeWidth="6" strokeLinecap="round" fill="none" />
+
+          {front}
+          {rear}
+          {swing}
+
+          {/* translucent roof so the passengers stay visible from above */}
+          <path d="M76 150 Q76 130 110 116 L250 116 Q284 130 284 150 L284 430 Q284 440 270 440 L90 440 Q76 440 76 430Z" fill="#14532d" opacity=".16" stroke="#14532d" strokeOpacity=".5" strokeWidth="3" />
+          {[[86, 126], [274, 126], [86, 432], [274, 432]].map(([x, y]) => (
+            <circle key={x + '-' + y} cx={x} cy={y} r="5" fill="#365314" />
+          ))}
+        </g>
       </svg>
     </div>
   );

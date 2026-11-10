@@ -37,63 +37,63 @@ body {
 }
 
 /* ---------- Scene ---------- */
-@keyframes skyline-drift {
+@keyframes scroll-road {
   to {
-    transform: translateX(-360px);
+    transform: translateY(80px);
   }
 }
-@keyframes road-dash {
-  from {
-    transform: scale(0.05);
-    opacity: 0;
-  }
+@keyframes scroll-side {
   to {
-    transform: scale(1);
-    opacity: 1;
+    transform: translateY(240px);
   }
 }
-@keyframes hand-slap {
-  0% {
-    transform: translate(0, 0) rotate(0);
-  }
-  12% {
-    transform: translate(var(--fx), var(--fy)) rotate(0);
-  }
-  30% {
-    transform: translate(var(--dx), var(--dy)) rotate(var(--rot));
-  }
-  44% {
-    transform: translate(var(--dx), var(--dy)) rotate(calc(var(--rot) * -0.5));
-  }
-  60% {
-    transform: translate(var(--dx), var(--dy)) rotate(var(--rot));
-  }
-  100% {
-    transform: translate(0, 0) rotate(0);
-  }
-}
-@keyframes sandal-grab {
-  0%,
-  11% {
-    opacity: 0;
-  }
-  12%,
-  100% {
-    opacity: 1;
-  }
-}
-@keyframes tread-scroll {
+@keyframes tread-up {
   to {
     transform: translateY(-12px);
   }
 }
+@keyframes rattle {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(0.8px);
+  }
+}
+@keyframes arm-ext {
+  0%,
+  100% {
+    transform: scaleY(0.2);
+  }
+  28%,
+  60% {
+    transform: scaleY(1);
+  }
+  44% {
+    transform: scaleY(0.93);
+  }
+}
+@keyframes fist-ext {
+  0%,
+  100% {
+    transform: translateY(calc(var(--d) * -0.2));
+  }
+  28%,
+  60% {
+    transform: translateY(calc(var(--d) * -1));
+  }
+  44% {
+    transform: translateY(calc(var(--d) * -0.93));
+  }
+}
 @keyframes spit-fly {
   0% {
-    transform: translate(0, 0) scale(0.6);
+    transform: translateY(0) scale(0.6);
     opacity: 1;
   }
   100% {
-    transform: translate(40px, 34px) scale(1.1);
+    transform: translateY(-30px) scale(1.2);
     opacity: 0;
   }
 }
@@ -124,38 +124,34 @@ body {
   }
 }
 
-.skyline-drift {
-  animation: skyline-drift 14s linear infinite;
+/* "slightly faster" speed: road 0.3s per dash period (was 0.4s), roofs 1.2s (was 1.6s), tread 0.19s, rattle 0.16s */
+.scroll-road {
+  animation: scroll-road 0.3s linear infinite;
 }
-.road-dash {
-  /* grows away from the vanishing point, so dashes rush toward the player */
-  transform-box: view-box;
-  transform-origin: 180px 190px;
-  animation: road-dash 1.2s ease-in infinite;
+.scroll-side {
+  animation: scroll-side 1.2s linear infinite;
 }
-@keyframes rattle {
-  0%,
-  100% {
-    transform: translateY(0);
-  }
-  50% {
-    transform: translateY(1.5px);
-  }
+.tread {
+  /* top of a rolling tire moves forward (up the screen) relative to the auto */
+  animation: tread-up 0.19s linear infinite;
 }
 .rattle {
-  animation: rattle 0.2s ease-in-out infinite;
+  animation: rattle 0.16s ease-in-out infinite;
+}
+.arm-ext,
+.fist-ext {
+  animation-duration: 0.55s;
+  animation-timing-function: ease-out;
+  animation-fill-mode: both;
+}
+.arm-ext {
+  animation-name: arm-ext;
+}
+.fist-ext {
+  animation-name: fist-ext;
 }
 .char {
   transition: transform 0.15s ease-out;
-}
-.hand-slap {
-  animation: hand-slap 0.55s ease-out both;
-}
-.sandal-grab {
-  animation: sandal-grab 0.55s linear both;
-}
-.tread {
-  animation: tread-scroll 0.25s linear infinite;
 }
 .spit-drop {
   animation: spit-fly 0.5s ease-out infinite;
@@ -168,8 +164,8 @@ body {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .skyline-drift,
-  .road-dash,
+  .scroll-road,
+  .scroll-side,
   .tread,
   .rattle,
   .spit-drop {

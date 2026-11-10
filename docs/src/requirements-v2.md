@@ -45,3 +45,26 @@ v1 showed a bus from the outside. In v2 the player **sits inside an auto-ricksha
 - **Always on screen:** the scene is drawn with `meet` (the whole view always shows), and the background and auto body extend past the edges for taller or wider screens. The two people are placed further inward so a spitting head never leaves the screen.
 - **The player, from behind:** the back of the player's head and purple shoulders sit at the bottom centre. The player's **hands are empty** at rest, and **sandals are on the player's feet** at the bottom corners.
 - **Slap:** on a spit, the hand on the spitter's side reaches down, **grabs the sandal off the foot** (the foot's sandal disappears), swings up and slaps. The spitter's face reacts when it lands, about 120 ms after the tap.
+
+## v2.4 changes
+- **Legs and sandals:** the player's two legs (dark trousers) come up from the seat to bare feet wearing sandals, at the bottom corners. While a hand has taken a sandal, that foot is bare.
+- **More of the player's body:** the player sits higher, so the back of the head, a wider back with a seam and the shoulders are clearly visible. The hands rest beside the head.
+- **Smaller sandal in the swing:** the sandal in the hand is 70% of its former size. The hand stays large.
+
+## v2.5 changes: top-down camera (supersedes the first-person scene in "What changes" and v2.1 to v2.4)
+- **Camera:** straight down on the whole auto-rickshaw, which drives **up** the screen. The road, lane dashes and roadside roofs scroll **down**. The roof is translucent so everyone's head, body and hands stay visible. The view always shows in full, and the road and pavements extend to fill any screen size.
+- **People:**
+  - Front row: the **front passenger** on the left, and the **driver** (cap, blue shirt) holding the handlebar.
+  - Back row: **three passengers side by side** on the rear bench, with legs forward and bare feet in sandals.
+- **Wheels:** a front wheel pokes out ahead of the nose, and two rear wheels stick out of the sides. Their tread scrolls forward, so the auto reads as moving forward.
+- **Spit:** the driver turns the head right and the front passenger turns left. The face shows puffed cheeks, pursed lips and droplets flying outward.
+- **Jutai:** the **rear passenger behind the spitter** slaps (rear left → front passenger, rear right → driver, rear middle only watches). The arm stretches forward, the fist holds a **small sandal**, and the sandal is taken off that person's foot. The spitter's head turns, shows a red mark and stars, and the arm retracts.
+- **Sandal size:** the sandal in the hand is about 30% of full size, so it never covers the scene.
+- Rules, timing and scoring are unchanged.
+
+## v2.6 changes: camera slightly above and behind (supersedes v2.5's straight-down view)
+- **Camera:** behind the auto and slightly above, looking forward: sky and skyline ahead, a road in perspective with lane dashes rushing toward the camera, the whole auto in view (rear wheels at the sides, front wheel ahead of the nose, translucent roof).
+- **Rear row (nearest):** three people **sitting** side by side on the rear bench. We see the backs of their heads, shoulders and backs above the seat backrest, with their hands resting at their sides.
+- **Front row (further away, smaller):** the front passenger on the left, and the driver holding the handlebar.
+- **Spit:** the head turns outward into profile (cross-eye, buck tooth, spit flying out). **Jutai:** the rear person behind the spitter swings the outer arm forward with a small sandal. Rear-left slaps the front passenger, rear-right slaps the driver, and the middle person watches.
+- The sandals are no longer shown on the feet, because the seated legs are hidden from this angle. The sandal simply appears in the hand.

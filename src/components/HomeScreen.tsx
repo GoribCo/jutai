@@ -16,7 +16,7 @@ export function HomeScreen({ best, onPlay }: HomeScreenProps) {
         <h1 className="mt-4 font-display text-6xl font-bold tracking-tight">Jutai</h1>
         <p className="font-display text-3xl text-red-700">জুতাই</p>
         <p className="mx-auto mt-5 max-w-xs text-lg font-semibold">
-          You are in the back seat of an auto-rickshaw. Someone in front spits out the side? Give them a jutai!
+          Someone in the auto spat out of the side? Give them a jutai before they get away!
         </p>
       </div>
 
