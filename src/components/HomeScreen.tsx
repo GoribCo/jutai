@@ -1,4 +1,4 @@
-import { Shoe } from './Character';
+import { Sandal } from './Character';
 import { InstallPrompt } from './InstallPrompt';
 
 interface HomeScreenProps {
@@ -10,13 +10,13 @@ export function HomeScreen({ best, onPlay }: HomeScreenProps) {
   return (
     <div className="flex h-full flex-col items-center justify-between bg-gradient-to-b from-amber-400 via-amber-300 to-amber-100 px-6 py-10 text-center text-amber-950">
       <div className="mt-6">
-        <svg viewBox="-40 -30 80 60" className="mx-auto w-40 -rotate-12 drop-shadow-lg" aria-hidden="true">
-          <Shoe />
+        <svg viewBox="-30 -60 60 120" className="mx-auto h-40 rotate-[25deg] drop-shadow-lg" aria-hidden="true">
+          <Sandal />
         </svg>
         <h1 className="mt-4 font-display text-6xl font-bold tracking-tight">Jutai</h1>
         <p className="font-display text-3xl text-red-700">জুতাই</p>
         <p className="mx-auto mt-5 max-w-xs text-lg font-semibold">
-          Someone spat out of the bus window? Give them a jutai before they get away!
+          You are in the back seat of an auto-rickshaw. Someone in front spits out the side? Give them a jutai!
         </p>
       </div>
 

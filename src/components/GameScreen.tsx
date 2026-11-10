@@ -95,7 +95,7 @@ export function GameScreen({ best, onFinish }: GameScreenProps) {
           aria-label="Jutai! (Space)"
           className="flex h-24 w-full items-center justify-center gap-3 rounded-3xl bg-red-600 font-display text-4xl font-bold text-white shadow-pop active:scale-95 active:bg-red-700"
         >
-          <span aria-hidden="true">👡</span> JUTAI!
+          <span aria-hidden="true">🩴</span> JUTAI!
         </button>
       </div>
     </div>

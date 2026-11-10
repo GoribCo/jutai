@@ -4,7 +4,7 @@ export const ROUND_MS = 60_000;
 export const WINDOW_START_MS = 1200;
 export const WINDOW_END_MS = 600;
 
-export const SPITTERS = ['driver', 'helper', 'conductor', 'passenger'] as const;
+export const SPITTERS = ['driver', 'passenger'] as const;
 export type Spitter = (typeof SPITTERS)[number];
 
 export interface Stats {
