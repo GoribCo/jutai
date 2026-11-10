@@ -62,9 +62,14 @@ v1 showed a bus from the outside. In v2 the player **sits inside an auto-ricksha
 - **Sandal size:** the sandal in the hand is about 30% of full size, so it never covers the scene.
 - Rules, timing and scoring are unchanged.
 
-## v2.6 changes: camera slightly above and behind (supersedes v2.5's straight-down view)
+## v2.6 (tried and dropped): camera slightly above and behind
+**Superseded: the game uses the v2.5 straight-down view.** Kept only for reference.
 - **Camera:** behind the auto and slightly above, looking forward: sky and skyline ahead, a road in perspective with lane dashes rushing toward the camera, the whole auto in view (rear wheels at the sides, front wheel ahead of the nose, translucent roof).
 - **Rear row (nearest):** three people **sitting** side by side on the rear bench. We see the backs of their heads, shoulders and backs above the seat backrest, with their hands resting at their sides.
 - **Front row (further away, smaller):** the front passenger on the left, and the driver holding the handlebar.
 - **Spit:** the head turns outward into profile (cross-eye, buck tooth, spit flying out). **Jutai:** the rear person behind the spitter swings the outer arm forward with a small sandal. Rear-left slaps the front passenger, rear-right slaps the driver, and the middle person watches.
 - The sandals are no longer shown on the feet, because the seated legs are hidden from this angle. The sandal simply appears in the hand.
+
+## v2.7 changes: final v2 scene
+- Back to the **v2.5 top-down view** (v2.6 was dropped), with the vehicle **about a third faster** (road 0.3 s, roofs 1.2 s, tread 0.19 s, rattle 0.16 s).
+- **Tap the spitting head** to jutai, in addition to the JUTAI button and Space/Enter. The tap target is the top layer of the scene; taps on anyone not spitting do nothing.
