@@ -37,58 +37,63 @@ body {
 }
 
 /* ---------- Scene ---------- */
-@keyframes skyline-scroll {
+@keyframes scroll-road {
   to {
-    background-position-x: -320px;
+    transform: translateY(80px);
   }
 }
-@keyframes road-scroll {
+@keyframes scroll-side {
   to {
-    background-position-x: -120px;
+    transform: translateY(240px);
   }
 }
-@keyframes bus-bounce {
+@keyframes tread-up {
+  to {
+    transform: translateY(-12px);
+  }
+}
+@keyframes rattle {
   0%,
   100% {
     transform: translateY(0);
   }
   50% {
-    transform: translateY(-2px);
+    transform: translateY(0.8px);
   }
 }
-@keyframes wheel-spin {
-  to {
-    transform: rotate(360deg);
-  }
-}
-@keyframes shoe-slap {
-  0% {
-    transform: translate(70px, -40px) rotate(70deg);
-    opacity: 0;
-  }
-  35% {
-    transform: translate(6px, -6px) rotate(-15deg);
-    opacity: 1;
-  }
-  50% {
-    transform: translate(12px, 0) rotate(12deg);
-  }
-  80% {
-    transform: translate(12px, 0) rotate(12deg);
-    opacity: 1;
-  }
+@keyframes arm-ext {
+  0%,
   100% {
-    transform: translate(40px, -20px) rotate(40deg);
-    opacity: 0;
+    transform: scaleY(0.2);
+  }
+  28%,
+  60% {
+    transform: scaleY(1);
+  }
+  44% {
+    transform: scaleY(0.93);
+  }
+}
+@keyframes fist-ext {
+  0%,
+  100% {
+    transform: translateY(calc(var(--d) * -0.2));
+  }
+  28%,
+  60% {
+    transform: translateY(calc(var(--d) * -1));
+  }
+  44% {
+    transform: translateY(calc(var(--d) * -0.93));
   }
 }
 @keyframes spit-fly {
   0% {
-    transform: translate(0, 0) scale(0.6);
+    transform: translateY(0) scale(0.6);
     opacity: 1;
   }
   100% {
-    transform: translate(-34px, 46px) scale(1.1);
+    transform: translateY(-30px) scale(1.2);
     opacity: 0;
   }
 }
@@ -119,41 +124,34 @@ body {
   }
 }
 
-.skyline {
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='320' height='90'%3E%3Cg fill='%23c08552' opacity='.55'%3E%3Crect x='0' y='40' width='50' height='50'/%3E%3Crect x='60' y='20' width='40' height='70'/%3E%3Crect x='110' y='50' width='60' height='40'/%3E%3Crect x='180' y='10' width='45' height='80'/%3E%3Crect x='235' y='35' width='35' height='55'/%3E%3Crect x='280' y='55' width='40' height='35'/%3E%3C/g%3E%3C/svg%3E");
-  background-repeat: repeat-x;
-  background-position-y: bottom;
-  animation: skyline-scroll 12s linear infinite;
+/* "slightly faster" speed: road 0.3s per dash period (was 0.4s), roofs 1.2s (was 1.6s), tread 0.19s, rattle 0.16s */
+.scroll-road {
+  animation: scroll-road 0.3s linear infinite;
 }
-.road {
-  background: #3b3b44;
+.scroll-side {
+  animation: scroll-side 1.2s linear infinite;
 }
-.road::after {
-  content: '';
-  position: absolute;
-  left: 0;
-  right: 0;
-  top: 55%;
-  height: 6px;
-  background-image: repeating-linear-gradient(90deg, #fde68a 0 60px, transparent 60px 120px);
-  animation: road-scroll 0.6s linear infinite;
+.tread {
+  /* top of a rolling tire moves forward (up the screen) relative to the auto */
+  animation: tread-up 0.19s linear infinite;
 }
-.bus-bounce {
-  animation: bus-bounce 0.35s ease-in-out infinite;
+.rattle {
+  animation: rattle 0.16s ease-in-out infinite;
 }
-.wheel {
-  transform-box: fill-box;
-  transform-origin: center;
-  animation: wheel-spin 0.5s linear infinite;
+.arm-ext,
+.fist-ext {
+  animation-duration: 0.55s;
+  animation-timing-function: ease-out;
+  animation-fill-mode: both;
+}
+.arm-ext {
+  animation-name: arm-ext;
+}
+.fist-ext {
+  animation-name: fist-ext;
 }
 .char {
   transition: transform 0.15s ease-out;
-}
-.char--lean {
-  transform: translate(2px, -14px) scale(1.18);
-}
-.shoe-slap {
-  animation: shoe-slap 0.7s ease-out both;
 }
 .spit-drop {
   animation: spit-fly 0.5s ease-out infinite;
@@ -166,10 +164,10 @@ body {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .skyline,
-  .road::after,
-  .bus-bounce,
-  .wheel,
+  .scroll-road,
+  .scroll-side,
+  .tread,
+  .rattle,
   .spit-drop {
     animation: none;
   }

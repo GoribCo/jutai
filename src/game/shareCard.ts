@@ -4,7 +4,7 @@ const W = 1080;
 const H = 1350;
 
 export function shareText(s: Stats) {
-  return `I landed ${s.hits} jutais out of ${s.spits} spits and scored ${s.score} in Jutai! ${verdict(s).title} 👡`;
+  return `I landed ${s.hits} jutais out of ${s.spits} spits and scored ${s.score} in Jutai! ${verdict(s).title} 🩴`;
 }
 
 /** Draws the share card to a canvas and returns it as a PNG. */
@@ -29,8 +29,12 @@ export function renderCard(s: Stats): Promise<Blob> {
   g.font = '700 80px system-ui, sans-serif';
   g.fillText('জুতাই', W / 2, 330);
 
-  g.font = '220px system-ui, sans-serif';
-  g.fillText('👡', W / 2, 600);
+  g.fillStyle = '#451a03';
+  g.font = '600 44px system-ui, sans-serif';
+  g.fillText('🛺 Auto-rickshaw edition', W / 2, 410);
+
+  g.font = '200px system-ui, sans-serif';
+  g.fillText('🩴', W / 2, 620);
 
   g.fillStyle = '#451a03';
   g.font = '700 260px system-ui, sans-serif';

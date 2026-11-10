@@ -1,5 +1,5 @@
 // Relative URLs throughout so it works under any GitHub Pages sub-path. Bump CACHE to invalidate.
-const CACHE = 'jutai-v1'
+const CACHE = 'jutai-v2'
 const PRECACHE = ['./', './manifest.json', './icon-192.png']
 
 self.addEventListener('install', (e) => {
